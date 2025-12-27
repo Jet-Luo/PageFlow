@@ -1,16 +1,19 @@
 'use client'
 
-import { ChevronsLeft, MenuIcon } from 'lucide-react'
+import { ChevronsLeft, MenuIcon, PlusCircle } from 'lucide-react'
 import React, { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useMediaQuery } from 'usehooks-ts'
 import { usePathname } from 'next/dist/client/components/navigation'
 import { cn } from '@/lib/utils'
 import UserItem from '@/app/(main)/_components/UserItem'
-import { useQuery } from 'convex/react'
+import { useMutation, useQuery } from 'convex/react'
 import { api } from '@/convex/_generated/api'
+import { Item } from '@/app/(main)/_components/Item'
+import { toast } from 'sonner'
 
 export const Navigation = () => {
   const pages = useQuery(api.pages.getPages)
+  const createPage = useMutation(api.pages.createPage)
 
   const pathname: string = usePathname()
   const isMobile: boolean = useMediaQuery('(max-width: 768px)')
@@ -165,6 +168,25 @@ export const Navigation = () => {
 
   // 总结：useCallback 用于稳定函数引用，防止因函数地址变化触发不必要的副作用调用，避免无限循环。
 
+  // const handleCreatePage = async (): Promise<void> => {
+  //   const newPage = await createPage({ title: 'Untitled Page' })
+  //   // Redirect to the newly created page's page
+  //   window.location.href = `/pages/${newPage._id.toString()}`
+  // }
+
+  const handleCreatePage = () => {
+    const promise = createPage({ title: 'Untitled' })
+    toast.promise(promise, {
+      loading: 'Creating your new page...',
+      success: (newPage) => {
+        // Redirect to the newly created page's page
+        // window.location.href = `/pages/${newPage._id.toString()}`
+        return 'Page created successfully!'
+      },
+      error: 'Error creating page. Please try again.'
+    })
+  }
+
   return (
     <>
       <aside
@@ -179,7 +201,7 @@ export const Navigation = () => {
           onClick={collapseSidebar}
           role="button"
           className={cn(
-            'text-muted-foreground absolute top-3 right-4 h-6 w-6 rounded-sm opacity-0 transition group-hover/sidebar:opacity-100 hover:bg-neutral-300 dark:bg-neutral-600',
+            'text-muted-foreground absolute top-3 right-4 h-6 w-6 cursor-pointer rounded-sm opacity-0 transition group-hover/sidebar:opacity-100 hover:bg-neutral-300 dark:bg-neutral-600',
             isMobile && 'opacity-100'
           )}
         >
@@ -187,6 +209,7 @@ export const Navigation = () => {
         </div>
         <div>
           <UserItem />
+          <Item label="New Page" onClick={handleCreatePage} icon={PlusCircle} />
         </div>
         <div className="mt-4">
           {pages?.map((page) => (
@@ -218,7 +241,7 @@ export const Navigation = () => {
             <MenuIcon
               onClick={showSidebar}
               role="button"
-              className="text-muted-foreground h-6 w-6 rounded-sm hover:bg-neutral-300 dark:bg-neutral-600"
+              className="text-muted-foreground h-6 w-6 cursor-pointer rounded-sm hover:bg-neutral-300 dark:bg-neutral-600"
             />
           )}
           123456789012345678901234567890123456789012345678901234567890
