@@ -6,8 +6,12 @@ import { useMediaQuery } from 'usehooks-ts'
 import { usePathname } from 'next/dist/client/components/navigation'
 import { cn } from '@/lib/utils'
 import UserItem from '@/app/(main)/_components/UserItem'
+import { useQuery } from 'convex/react'
+import { api } from '@/convex/_generated/api'
 
 export const Navigation = () => {
+  const pages = useQuery(api.pages.getPages)
+
   const pathname: string = usePathname()
   const isMobile: boolean = useMediaQuery('(max-width: 768px)')
 
@@ -185,23 +189,15 @@ export const Navigation = () => {
           <UserItem />
         </div>
         <div className="mt-4">
-          <p>documents list </p>
+          {pages?.map((page) => (
+            <div
+              key={page._id.toString()}
+              className="hover:bg-primary/10 mb-2 cursor-pointer rounded-md px-4 py-2"
+            >
+              <p>{page.title || 'Untitled Page'}</p>
+            </div>
+          ))}
         </div>{' '}
-        <div className="mt-4">
-          <p>documents list </p>
-        </div>{' '}
-        <div className="mt-4">
-          <p>documents list </p>
-        </div>{' '}
-        <div className="mt-4">
-          <p>documents list </p>
-        </div>{' '}
-        <div className="mt-4">
-          <p>documents list </p>
-        </div>{' '}
-        <div className="mt-4">
-          <p>documents list </p>
-        </div>
         {/* 拖动条 */}
         <div
           onMouseDown={handleMouseDown}
