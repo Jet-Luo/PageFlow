@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronsLeft, MenuIcon, PlusCircle } from 'lucide-react'
+import { ChevronsLeft, MenuIcon, PlusCircle, Search, Settings } from 'lucide-react'
 import React, { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useMediaQuery } from 'usehooks-ts'
 import { usePathname } from 'next/dist/client/components/navigation'
@@ -209,7 +209,9 @@ export const Navigation = () => {
         </div>
         <div>
           <UserItem />
-          <Item label="New Page" onClick={handleCreatePage} icon={PlusCircle} />
+          <Item label="Search" icon={Search} onClick={() => {}} isSearch />
+          <Item label="Settings" icon={Settings} onClick={() => {}} />
+          <Item label="New Page" icon={PlusCircle} onClick={handleCreatePage} />
         </div>
         <div className="mt-4">
           {pages?.map((page) => (
