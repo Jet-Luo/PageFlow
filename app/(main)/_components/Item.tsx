@@ -48,7 +48,7 @@ export const Item = ({
     if (!id) return
     const promise = create({ title: 'Untitled Page', parentPage: id }).then((pageId) => {
       if (!expanded) onExpand?.()
-      // router.push(`/documents/${pageId}`)
+      // router.push(`/pages/${pageId}`)
     })
     toast.promise(promise, {
       loading: 'Creating your new page...',

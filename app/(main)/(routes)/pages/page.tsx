@@ -8,7 +8,7 @@ import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { toast } from 'sonner'
 
-const DocumentsPage = () => {
+const PagesPage = () => {
   const { user } = useUser()
   const createPage = useMutation(api.pages.createPage)
 
@@ -28,7 +28,7 @@ const DocumentsPage = () => {
     // try {
     //   const newDocument = await createPage({ title: 'Untitled Page', parentDocument: null })
     //   // Redirect to the newly created document's page
-    //   window.location.href = `/documents/${newDocument._id.toString()}`
+    //   window.location.href = `/pages/${newDocument._id.toString()}`
     // } catch (error) {
     //   console.error('Error creating document:', error)
     // }
@@ -55,9 +55,9 @@ const DocumentsPage = () => {
         Create your first Page
       </Button>
       {/*<h1 className="text-2xl font-bold">Documents Page</h1>*/}
-      {/*<p className="mt-4">This is the documents page content.</p>*/}
+      {/*<p className="mt-4">This is the pages page content.</p>*/}
     </div>
   )
 }
 
-export default DocumentsPage
+export default PagesPage

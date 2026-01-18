@@ -40,7 +40,7 @@ export const Heading = () => {
       )}
       {!isLoading && isAuthenticated && (
         <Button asChild>
-          <Link href="/documents">
+          <Link href="/pages">
             Flow Your Ideas Now
             {/*<ArrowRight className="h-4 2-4 ml-2"/>*/}
             <ArrowRight />

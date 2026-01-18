@@ -34,7 +34,7 @@ export const PageList = ({ parentPageId, level = 0 }: PageListProps) => {
   })
 
   const onRedirect = (pageId: Id<'pages'>) => {
-    router.push(`/documents/${pageId}`)
+    router.push(`/pages/${pageId}`)
   }
 
   // 若 pages 还未加载完成（即为 undefined），则显示加载中状态
