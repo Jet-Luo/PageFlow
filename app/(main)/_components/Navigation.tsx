@@ -6,13 +6,14 @@ import { useMediaQuery } from 'usehooks-ts'
 import { usePathname } from 'next/dist/client/components/navigation'
 import { cn } from '@/lib/utils'
 import UserItem from '@/app/(main)/_components/UserItem'
-import { useMutation, useQuery } from 'convex/react'
+import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { Item } from '@/app/(main)/_components/Item'
 import { toast } from 'sonner'
+import { PageList } from '@/app/(main)/_components/PageList'
 
 export const Navigation = () => {
-  const pages = useQuery(api.pages.getPages)
+  // const pages = useQuery(api.pages.getPages)
   const createPage = useMutation(api.pages.createPage)
 
   const pathname: string = usePathname()
@@ -156,7 +157,7 @@ export const Navigation = () => {
   // useEffect 再次执行。
   // 再次 setState -> 渲染 3 -> 创建地址 C -> 再次执行 Effect...
   // 结果：无限循环（Infinite Loop）。
-
+  //
   // 用 useCallback 包裹后，showSidebar 只有在 isMobile 变化时才会变，从而打破循环。流程如下：
   // 渲染 1：useCallback 创建并缓存函数 (地址 A)。
   // useEffect 执行，依赖是 [地址 A]。
@@ -165,7 +166,7 @@ export const Navigation = () => {
   // useCallback 直接返回缓存的地址 A（而不是创建新的）。
   // useEffect 检查依赖：发现 地址 A === 地址 A。
   // 结果：useEffect 不执行。循环终止。
-
+  //
   // 总结：useCallback 用于稳定函数引用，防止因函数地址变化触发不必要的副作用调用，避免无限循环。
 
   // const handleCreatePage = async (): Promise<void> => {
@@ -214,15 +215,16 @@ export const Navigation = () => {
           <Item label="New Page" icon={PlusCircle} onClick={handleCreatePage} />
         </div>
         <div className="mt-4">
-          {pages?.map((page) => (
-            <div
-              key={page._id.toString()}
-              className="hover:bg-primary/10 mb-2 cursor-pointer rounded-md px-4 py-2"
-            >
-              <p>{page.title || 'Untitled Page'}</p>
-            </div>
-          ))}
-        </div>{' '}
+          {/*{pages?.map((page) => (*/}
+          {/*  <div*/}
+          {/*    key={page._id.toString()}*/}
+          {/*    className="hover:bg-primary/10 mb-2 cursor-pointer rounded-md px-4 py-2"*/}
+          {/*  >*/}
+          {/*    <p>{page.title || 'Untitled Page'}</p>*/}
+          {/*  </div>*/}
+          {/*))}*/}
+          <PageList />
+        </div>
         {/* 拖动条 */}
         <div
           onMouseDown={handleMouseDown}

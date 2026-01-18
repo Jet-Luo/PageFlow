@@ -1,20 +1,26 @@
 'use client'
 
-import { ChevronDown, ChevronRight, LucideIcon } from 'lucide-react'
+import { ChevronDown, ChevronRight, LucideIcon, Plus } from 'lucide-react'
 import { Id } from '@/convex/_generated/dataModel'
 import { cn } from '@/lib/utils'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
+// import { router } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface ItemProps {
-  label: string
-  icon: LucideIcon
-  onClick: () => void
-  isSearch?: boolean
-  id?: Id<'pages'>
-  pageIcon?: string
-  level?: number
-  active?: boolean
-  expanded?: boolean
-  onExpand?: () => void
+  label: string // 必填：必须传一个字符串（比如 "Settings"）
+  icon: LucideIcon // 必填：必须传一个 Lucide 的图标组件
+  onClick: () => void // 必填：必须传一个函数，点击时执行
+  // 下面带有 '?' 的都是“可选”的（Optional）
+  isSearch?: boolean // 选填：如果是 true/false，不传默认就是 undefined
+  id?: Id<'pages'> // 选填：特定的 ID 类型
+  pageIcon?: string // 选填：字符串
+  level?: number // 选填：数字（用于缩进层级）
+  active?: boolean // 选填：是否处于激活状态
+  expanded?: boolean // 选填：是否展开
+  onExpand?: () => void // 选填：展开时的回调函数
 }
 
 export const Item = ({
@@ -31,6 +37,26 @@ export const Item = ({
 }: ItemProps) => {
   const ChevronIcon = expanded ? ChevronDown : ChevronRight
 
+  const handleExpandClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation() // 阻止事件冒泡，避免触发父元素的 onClick
+    onExpand?.() // ?. 是可选链操作符，确保 onExpand 存在时才调用
+  }
+
+  const create = useMutation(api.pages.createPage)
+  const onCreateClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation() // 阻止事件冒泡，避免触发父元素的 onClick
+    if (!id) return
+    const promise = create({ title: 'Untitled Page', parentPage: id }).then((pageId) => {
+      if (!expanded) onExpand?.()
+      // router.push(`/documents/${pageId}`)
+    })
+    toast.promise(promise, {
+      loading: 'Creating your new page...',
+      success: 'Page created successfully!',
+      error: 'Error creating page. Please try again.'
+    })
+  }
+
   return (
     <div
       onClick={onClick}
@@ -45,8 +71,8 @@ export const Item = ({
       {!!id && (
         <div
           role="button"
-          className="mr-1 h-full cursor-pointer rounded-sm hover:bg-neutral-300 dark:bg-neutral-600"
-          onClick={() => {}}
+          className="mr-1 h-full cursor-pointer rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
+          onClick={handleExpandClick}
         >
           <ChevronIcon className="text-muted-foreground/50 h-4 w-4 shrink-0" />
         </div>
@@ -68,6 +94,32 @@ export const Item = ({
           <span className="translate-y-px text-sm">⌘</span>K
         </kbd>
       )}
+
+      {/* 右侧添加图标：仅当id存在时显示 */}
+      {!!id && (
+        <div className="ml-auto flex items-center gap-x-2">
+          <div
+            role="button"
+            onClick={onCreateClick}
+            className="ml-auto h-full rounded-sm opacity-0 group-hover:opacity-100 hover:bg-neutral-300 dark:hover:bg-neutral-600"
+          >
+            <Plus className="text-muted-foreground h-4 w-4" />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+Item.Skeleton = function ItemSkeleton({ level }: { level?: number }) {
+  return (
+    <div
+      style={{ paddingLeft: level ? `${level * 12 + 25}px` : '12px' }} // 根据层级调整左侧内边距
+      // className="bg-muted-foreground/10 flex min-h-[27px] w-full animate-pulse cursor-pointer items-center py-1 pr-3"
+      className="flex gap-x-2 py-[3px]"
+    >
+      <Skeleton className="h-4 w-4" />
+      <Skeleton className="h-4 w-[30%]" />
     </div>
   )
 }
