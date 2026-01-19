@@ -1,6 +1,7 @@
 'use client'
 
-import { ChevronDown, ChevronRight, LucideIcon, Plus } from 'lucide-react'
+import { ChevronDown, ChevronRight, LucideIcon, MoreHorizontal, Plus, Trash } from 'lucide-react'
+import { useUser } from '@clerk/nextjs'
 import { Id } from '@/convex/_generated/dataModel'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -8,6 +9,13 @@ import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 // import { router } from 'next/navigation'
 import { toast } from 'sonner'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 
 interface ItemProps {
   label: string // 必填：必须传一个字符串（比如 "Settings"）
@@ -35,6 +43,7 @@ export const Item = ({
   expanded,
   onExpand
 }: ItemProps) => {
+  const { user } = useUser()
   const ChevronIcon = expanded ? ChevronDown : ChevronRight
 
   const handleExpandClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -54,6 +63,19 @@ export const Item = ({
       loading: 'Creating your new page...',
       success: 'Page created successfully!',
       error: 'Error creating page. Please try again.'
+    })
+  }
+
+  const archive = useMutation(api.pages.archivePage)
+  const onArchiveClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation() // 阻止事件冒泡，避免触发父元素的 onClick
+    if (!id) return
+    const promise = archive({ id })
+    // const promise = archive({ pageId: id })
+    toast.promise(promise, {
+      loading: 'Moving to trash...',
+      success: 'Page moved to trash!',
+      error: 'Error moving page to trash. Please try again.'
     })
   }
 
@@ -98,6 +120,26 @@ export const Item = ({
       {/* 右侧添加图标：仅当id存在时显示 */}
       {!!id && (
         <div className="ml-auto flex items-center gap-x-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger onClick={(e) => e.stopPropagation()} asChild>
+              <div
+                role="button"
+                className="ml-auto h-full rounded-sm opacity-0 group-hover:opacity-100 hover:bg-neutral-300 dark:hover:bg-neutral-600"
+              >
+                <MoreHorizontal className="text-muted-foreground h-4 w-4" />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-60" align="start" side="right" forceMount>
+              <DropdownMenuItem className="cursor-pointer" onClick={onArchiveClick}>
+                <Trash className="mr-2 h-4 w-4" />
+                Delete Page
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <div className="text-muted-foreground p-2 text-sm">
+                Last edited by: {user ? user.fullName : 'You'}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <div
             role="button"
             onClick={onCreateClick}
