@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -121,7 +121,17 @@
   }
 }
 
+/* Change cursor to pointer for buttons and elements with role="button" */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* Make sure the html and body elements take full height */
-html, body, :root {
+html,
+body,
+:root {
   height: 100%;
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronsLeft, MenuIcon, PlusCircle, Search, Settings } from 'lucide-react'
+import { ChevronsLeft, MenuIcon, Plus, PlusCircle, Search, Settings, Trash } from 'lucide-react'
 import React, { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useMediaQuery } from 'usehooks-ts'
 import { usePathname } from 'next/dist/client/components/navigation'
@@ -11,6 +11,8 @@ import { api } from '@/convex/_generated/api'
 import { Item } from '@/app/(main)/_components/Item'
 import { toast } from 'sonner'
 import { PageList } from '@/app/(main)/_components/PageList'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { TrashBox } from '@/app/(main)/_components/TrashBox'
 
 export const Navigation = () => {
   // const pages = useQuery(api.pages.getPages)
@@ -202,7 +204,7 @@ export const Navigation = () => {
           onClick={collapseSidebar}
           role="button"
           className={cn(
-            'text-muted-foreground absolute top-3 right-4 h-6 w-6 cursor-pointer rounded-sm opacity-0 transition group-hover/sidebar:opacity-100 hover:bg-neutral-300 dark:bg-neutral-600',
+            'text-muted-foreground absolute top-3 right-4 h-6 w-6 rounded-sm opacity-0 transition group-hover/sidebar:opacity-100 hover:bg-neutral-300 dark:bg-neutral-600',
             isMobile && 'opacity-100'
           )}
         >
@@ -224,6 +226,15 @@ export const Navigation = () => {
           {/*  </div>*/}
           {/*))}*/}
           <PageList />
+          <Item label="Add a page" icon={Plus} onClick={handleCreatePage} />
+          <Popover>
+            <PopoverTrigger className="mt-4 w-full">
+              <Item label="Trash" icon={Trash} />
+            </PopoverTrigger>
+            <PopoverContent side={isMobile ? 'top' : 'right'} align="start">
+              <TrashBox />
+            </PopoverContent>
+          </Popover>
         </div>
         {/* 拖动条 */}
         <div
@@ -245,7 +256,7 @@ export const Navigation = () => {
             <MenuIcon
               onClick={showSidebar}
               role="button"
-              className="text-muted-foreground h-6 w-6 cursor-pointer rounded-sm hover:bg-neutral-300 dark:bg-neutral-600"
+              className="text-muted-foreground h-6 w-6 rounded-sm hover:bg-neutral-300 dark:bg-neutral-600"
             />
           )}
           123456789012345678901234567890123456789012345678901234567890

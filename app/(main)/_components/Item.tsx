@@ -20,8 +20,8 @@ import {
 interface ItemProps {
   label: string // 必填：必须传一个字符串（比如 "Settings"）
   icon: LucideIcon // 必填：必须传一个 Lucide 的图标组件
-  onClick: () => void // 必填：必须传一个函数，点击时执行
   // 下面带有 '?' 的都是“可选”的（Optional）
+  onClick?: () => void // 选填：点击时的回调函数
   isSearch?: boolean // 选填：如果是 true/false，不传默认就是 undefined
   id?: Id<'pages'> // 选填：特定的 ID 类型
   pageIcon?: string // 选填：字符串
@@ -85,7 +85,7 @@ export const Item = ({
       role="button"
       style={{ paddingLeft: level ? `${level * 12 + 12}px` : '12px' }} // 根据层级调整左侧内边距
       className={cn(
-        'group hover:bg-primary/5 text-muted-foreground flex min-h-[27px] w-full cursor-pointer items-center py-1 pr-3 text-sm font-medium',
+        'group hover:bg-primary/5 text-muted-foreground flex min-h-[27px] w-full items-center py-1 pr-3 text-sm font-medium',
         active && 'bg-primary/5 text-primary font-semibold'
       )}
     >
@@ -93,7 +93,7 @@ export const Item = ({
       {!!id && (
         <div
           role="button"
-          className="mr-1 h-full cursor-pointer rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
+          className="mr-1 h-full rounded-sm hover:bg-neutral-300 dark:hover:bg-neutral-600"
           onClick={handleExpandClick}
         >
           <ChevronIcon className="text-muted-foreground/50 h-4 w-4 shrink-0" />
@@ -104,7 +104,7 @@ export const Item = ({
       {pageIcon ? (
         <div className="mr-2 shrink-0 text-[18px]">{pageIcon}</div>
       ) : (
-        <Icon className="text-muted-foreground mr-2 h-[18px] shrink-0" />
+        <Icon className="text-muted-foreground mr-2 h-[18px] w-[18px] shrink-0" />
       )}
 
       {/* Item标签文字 */}

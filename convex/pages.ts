@@ -1,7 +1,7 @@
 import { v } from 'convex/values'
 
 import { mutation, query } from './_generated/server'
-import { Id } from './_generated/dataModel'
+import { Doc, Id } from './_generated/dataModel'
 // import { Doc, Id } from './_generated/dataModel'
 
 export const getPages = query({
@@ -106,5 +106,123 @@ export const archivePage = mutation({
     await recursiveArchive(args.id)
 
     return archivedPage
+  }
+})
+
+export const getTrashPages = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error('Unauthorized')
+
+    const userId = identity.subject
+    const pages = await ctx.db
+      .query('pages')
+      .withIndex('by_user', (q) => q.eq('userId', userId))
+      .filter((q) => q.eq(q.field('isArchived'), true))
+      .order('desc')
+      .collect()
+
+    return pages
+  }
+})
+
+export const restorePage = mutation({
+  args: {
+    id: v.id('pages')
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error('Unauthorized')
+
+    const userId = identity.subject
+
+    const existingPage = await ctx.db.get(args.id)
+    if (!existingPage) throw new Error('Page not found')
+    if (existingPage.userId !== userId) throw new Error('Forbidden')
+
+    // 实现恢复，通过将 isArchived 设置为 false
+    // 需求：实现恢复时，连同其所有子页面一并恢复（递归实现）
+    const recursiveRestore = async (pageId: Id<'pages'>) => {
+      const childPages = await ctx.db
+        .query('pages')
+        .withIndex('by_user_parent', (q) => q.eq('userId', userId).eq('parentPage', pageId))
+        .collect()
+
+      for (const childPage of childPages) {
+        await ctx.db.patch(childPage._id, { isArchived: false })
+        await recursiveRestore(childPage._id)
+      }
+    }
+
+    // 需检查：当前页面的父页面是否被归档，如果是，则设置当前页面的父页面为 undefined，即断除与父页面的关联
+    // options 用于存储要更新的字段，这里是 isArchived 和可能的 parentPage
+    // Partial<Doc<'pages'>> 表示这个对象可以包含 Doc<'pages'> 类型的任意子集，即可以只包含部分字段
+    const options: Partial<Doc<'pages'>> = {
+      isArchived: false
+    }
+
+    const parentPageId = existingPage.parentPage
+    if (parentPageId) {
+      const parentPage = await ctx.db.get(parentPageId)
+      if (parentPage && parentPage.isArchived) {
+        options.parentPage = undefined
+      }
+    }
+
+    // 恢复当前页面
+    const restoredPage = await ctx.db.patch(args.id, options)
+
+    await recursiveRestore(args.id)
+
+    return restoredPage
+  }
+})
+
+export const deletePagePermanently = mutation({
+  args: {
+    id: v.id('pages')
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error('Unauthorized')
+
+    const userId = identity.subject
+
+    const existingPage = await ctx.db.get(args.id)
+    if (!existingPage) throw new Error('Page not found')
+    if (existingPage.userId !== userId) throw new Error('Forbidden')
+
+    // 实现永久删除
+    // 需求一：实现删除时，连同其所有子页面一并删除（递归实现）
+    // const recursiveDelete = async (pageId: Id<'pages'>) => {
+    //   const childPages = await ctx.db
+    //     .query('pages')
+    //     .withIndex('by_user_parent', (q) => q.eq('userId', userId).eq('parentPage', pageId))
+    //     .collect()
+    //
+    //   for (const childPage of childPages) {
+    //     await recursiveDelete(childPage._id)
+    //     await ctx.db.delete(childPage._id)
+    //   }
+    // }
+    //
+    // await recursiveDelete(args.id)
+    // await ctx.db.delete(args.id)
+    //
+    // return { success: true }
+
+    // 需求二：只删除当前页面，保留子页面，但将子页面的 parentPage 设为 undefined
+    const childPages = await ctx.db
+      .query('pages')
+      .withIndex('by_user_parent', (q) => q.eq('userId', userId).eq('parentPage', args.id))
+      .collect()
+
+    for (const childPage of childPages) {
+      await ctx.db.patch(childPage._id, { parentPage: undefined })
+    }
+
+    const deletedPage = await ctx.db.delete(args.id)
+
+    return deletedPage
   }
 })
