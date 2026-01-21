@@ -2,18 +2,6 @@ import { v } from 'convex/values'
 
 import { mutation, query } from './_generated/server'
 import { Doc, Id } from './_generated/dataModel'
-// import { Doc, Id } from './_generated/dataModel'
-
-export const getPages = query({
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity()
-    if (!identity) throw new Error('Unauthorized')
-
-    const pages = await ctx.db.query('pages').collect()
-
-    return pages
-  }
-})
 
 export const getSidebarPages = query({
   args: {
@@ -27,6 +15,23 @@ export const getSidebarPages = query({
     const pages = await ctx.db
       .query('pages')
       .withIndex('by_user_parent', (q) => q.eq('userId', userId).eq('parentPage', args.parentPage))
+      .filter((q) => q.eq(q.field('isArchived'), false))
+      .order('desc')
+      .collect()
+
+    return pages
+  }
+})
+
+export const getSearchPages = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error('Unauthorized')
+
+    const UserId = identity.subject
+    const pages = await ctx.db
+      .query('pages')
+      .withIndex('by_user', (q) => q.eq('userId', UserId))
       .filter((q) => q.eq(q.field('isArchived'), false))
       .order('desc')
       .collect()

@@ -13,9 +13,13 @@ import { toast } from 'sonner'
 import { PageList } from '@/app/(main)/_components/PageList'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TrashBox } from '@/app/(main)/_components/TrashBox'
+import { useSearch } from '@/hooks/use-search'
 
 export const Navigation = () => {
-  // const pages = useQuery(api.pages.getPages)
+  // const search = useSearch() // 将导致 Navigation 在 isOpen 变化时重新渲染，但 Navigation 本身并不依赖 isOpen，所以无需整体订阅
+  const onOpen = useSearch((state) => state.onOpen) // 只订阅 onOpen 方法，避免不必要的渲染
+  // console.log('🔵 Navigation 渲染') // ← 会在 isOpen 变化时打印
+
   const createPage = useMutation(api.pages.createPage)
 
   const pathname: string = usePathname()
@@ -212,7 +216,7 @@ export const Navigation = () => {
         </div>
         <div>
           <UserItem />
-          <Item label="Search" icon={Search} onClick={() => {}} isSearch />
+          <Item label="Search" icon={Search} onClick={onOpen} isSearch />
           <Item label="Settings" icon={Settings} onClick={() => {}} />
           <Item label="New Page" icon={PlusCircle} onClick={handleCreatePage} />
         </div>
