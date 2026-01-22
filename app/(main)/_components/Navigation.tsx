@@ -15,6 +15,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { TrashBox } from '@/app/(main)/_components/TrashBox'
 import { useSearch } from '@/hooks/use-search'
 import { useSettings } from '@/hooks/use-settings'
+import { useParams } from 'next/navigation'
+import { Navbar } from '@/app/(main)/_components/Navbar'
 
 export const Navigation = () => {
   // const search = useSearch() // 将导致 Navigation 在 isOpen 变化时重新渲染，但 Navigation 本身并不依赖 isOpen，所以无需整体订阅
@@ -24,6 +26,7 @@ export const Navigation = () => {
 
   const createPage = useMutation(api.pages.createPage)
 
+  const params = useParams()
   const pathname: string = usePathname()
   const isMobile: boolean = useMediaQuery('(max-width: 768px)')
 
@@ -198,6 +201,7 @@ export const Navigation = () => {
 
   return (
     <>
+      {/* 侧边栏 */}
       <aside
         ref={sidebarRef}
         className={cn(
@@ -249,24 +253,30 @@ export const Navigation = () => {
           className="bg-primary/10 absolute top-0 right-0 h-full w-1 cursor-ew-resize opacity-0 transition group-hover/sidebar:opacity-100"
         />
       </aside>
+
+      {/* 顶部导航栏 */}
       <nav
         ref={navbarRef}
         className={cn(
           'bg-secondary absolute top-0 left-60 z-9999 h-16 w-[calc(100%-15rem)]',
-          isResetting && 'transition-all duration-300',
-          isMobile && 'left-0 w-full'
+          isResetting && 'transition-all duration-300'
+          // isMobile && 'left-0 w-full'
         )}
       >
-        <div className="w-full bg-transparent px-3 py-2">
-          {isCollapsed && (
-            <MenuIcon
-              onClick={showSidebar}
-              role="button"
-              className="text-muted-foreground h-6 w-6 rounded-sm hover:bg-neutral-300 dark:bg-neutral-600"
-            />
-          )}
-          123456789012345678901234567890123456789012345678901234567890
-        </div>
+        {!!params.pageId ? (
+          <Navbar isCollapsed={isCollapsed} onResetWidth={showSidebar} />
+        ) : (
+          <div className="w-full bg-transparent px-3 py-2">
+            {isCollapsed && (
+              <MenuIcon
+                onClick={showSidebar}
+                role="button"
+                className="text-muted-foreground h-6 w-6 rounded-sm hover:bg-neutral-300 dark:bg-neutral-600"
+              />
+            )}
+            123456789012345678901234567890123456789012345678901234567890
+          </div>
+        )}
       </nav>
     </>
   )

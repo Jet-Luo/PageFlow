@@ -231,3 +231,55 @@ export const deletePagePermanently = mutation({
     return deletedPage
   }
 })
+
+export const getPageById = query({
+  args: {
+    id: v.id('pages')
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    // 因为页面可以是公开的（isPublished），所以不需要一开始就验证身份（后续会根据页面状态再决定是否需要身份验证）
+    // if (!identity) throw new Error('Unauthorized')
+    //
+    // const userId = identity.subject
+
+    const page = await ctx.db.get(args.id)
+    if (!page) throw new Error('Page not found')
+
+    if (page.isPublished && !page.isArchived) return page
+
+    if (!identity) throw new Error('Unauthorized')
+    const userId = identity.subject
+    if (page.userId !== userId) throw new Error('Forbidden')
+
+    return page
+  }
+})
+
+export const updatePage = mutation({
+  args: {
+    id: v.id('pages'),
+    title: v.optional(v.string()),
+    content: v.optional(v.string()),
+    coverImage: v.optional(v.string()),
+    icon: v.optional(v.string()),
+    isPublished: v.optional(v.boolean())
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error('Unauthorized')
+
+    const userId = identity.subject
+
+    // 使用解构赋值提取 id，剩余字段组成 updateData 对象
+    const { id, ...updateData } = args
+
+    const existingPage = await ctx.db.get(id)
+    if (!existingPage) throw new Error('Page not found')
+    if (existingPage.userId !== userId) throw new Error('Forbidden')
+
+    const updatedPage = await ctx.db.patch(id, updateData)
+
+    return updatedPage
+  }
+})
