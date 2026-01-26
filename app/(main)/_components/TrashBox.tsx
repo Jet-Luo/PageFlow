@@ -44,7 +44,7 @@ export const TrashBox = () => {
   const onDeletePermanently = (pageId: Id<'pages'>) => {
     const promise = deletePermanently({ id: pageId })
     toast.promise(promise, {
-      loading: 'Deleting page permanently...',
+      loading: 'Deleting page...',
       success: 'Page deleted permanently!',
       error: 'Error deleting page. Please try again.'
     })
