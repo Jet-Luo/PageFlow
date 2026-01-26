@@ -283,3 +283,23 @@ export const updatePage = mutation({
     return updatedPage
   }
 })
+
+export const removeIcon = mutation({
+  args: {
+    id: v.id('pages')
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error('Unauthorized')
+
+    const userId = identity.subject
+
+    const existingPage = await ctx.db.get(args.id)
+    if (!existingPage) throw new Error('Page not found')
+    if (existingPage.userId !== userId) throw new Error('Forbidden')
+
+    const updatedPage = await ctx.db.patch(args.id, { icon: undefined })
+
+    return updatedPage
+  }
+})
