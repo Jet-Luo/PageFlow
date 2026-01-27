@@ -12,6 +12,9 @@
     "convex:dev": "pnpm dlx convex dev"
   },
   "dependencies": {
+    "@blocknote/core": "^0.46.1",
+    "@blocknote/mantine": "^0.46.1",
+    "@blocknote/react": "^0.46.1",
     "@clerk/nextjs": "^6.36.3",
     "@edgestore/react": "^0.7.0",
     "@edgestore/server": "^0.7.0",

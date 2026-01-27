@@ -77,7 +77,7 @@ export const PageList = ({ parentPageId, level = 0 }: PageListProps) => {
             id={page._id}
             pageIcon={page.icon}
             level={level}
-            active={params.documentId === page._id.toString()}
+            active={params.pageId === page._id.toString()}
             expanded={!!expanded[page._id.toString()]}
             onExpand={() => onExpand(page._id)}
           />

@@ -11,7 +11,7 @@ type coverImageStore = {
 export const useCoverImage = create<coverImageStore>((set) => ({
   url: undefined,
   isOpen: false,
-  onOpen: () => set({ isOpen: true }),
+  onOpen: () => set({ isOpen: true, url: undefined }), // 打开模态框且不设置 URL
   onClose: () => set({ isOpen: false, url: undefined }), // 关闭模态框并清除 URL
   onReplace: (url: string) => set({ isOpen: true, url }) // 替换封面图片并打开模态框
 }))
