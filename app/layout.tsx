@@ -6,6 +6,7 @@ import ConvexClientProvider from '@/components/providers/convex-provider'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from '@/components/ui/sonner'
 import { ModalProvider } from '@/components/providers/modal-provider'
+import { EdgeStoreProvider } from '@/lib/edgestore'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -46,17 +47,19 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ClerkProvider>
           <ConvexClientProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-              storageKey="page-flow-theme"
-            >
-              {children}
-              <Toaster />
-              <ModalProvider />
-            </ThemeProvider>
+            <EdgeStoreProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+                storageKey="page-flow-theme"
+              >
+                {children}
+                <Toaster />
+                <ModalProvider />
+              </ThemeProvider>
+            </EdgeStoreProvider>
           </ConvexClientProvider>
         </ClerkProvider>
       </body>

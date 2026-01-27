@@ -273,6 +273,7 @@ export const updatePage = mutation({
 
     // 使用解构赋值提取 id，剩余字段组成 updateData 对象
     const { id, ...updateData } = args
+    console.log('Update Data:', updateData)
 
     const existingPage = await ctx.db.get(id)
     if (!existingPage) throw new Error('Page not found')
@@ -299,6 +300,26 @@ export const removeIcon = mutation({
     if (existingPage.userId !== userId) throw new Error('Forbidden')
 
     const updatedPage = await ctx.db.patch(args.id, { icon: undefined })
+
+    return updatedPage
+  }
+})
+
+export const removeCoverImage = mutation({
+  args: {
+    id: v.id('pages')
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) throw new Error('Unauthorized')
+
+    const userId = identity.subject
+
+    const existingPage = await ctx.db.get(args.id)
+    if (!existingPage) throw new Error('Page not found')
+    if (existingPage.userId !== userId) throw new Error('Forbidden')
+
+    const updatedPage = await ctx.db.patch(args.id, { coverImage: undefined })
 
     return updatedPage
   }

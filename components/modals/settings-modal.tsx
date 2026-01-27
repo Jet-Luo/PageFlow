@@ -10,7 +10,7 @@ export const SettingsModal = () => {
 
   return (
     <Dialog open={settings.isOpen} onOpenChange={settings.onClose}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader className="border-b pb-3">
           <DialogTitle className="text-lg font-medium">Settings</DialogTitle>
         </DialogHeader>

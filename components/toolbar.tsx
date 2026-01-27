@@ -8,6 +8,7 @@ import { Doc } from '@/convex/_generated/dataModel'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import TextareaAutosize from 'react-textarea-autosize'
+import { useCoverImage } from '@/hooks/use-cover-image'
 
 interface ToolbarProps {
   initialData: Doc<'pages'>
@@ -15,6 +16,7 @@ interface ToolbarProps {
 }
 
 export const Toolbar = ({ initialData, preview = false }: ToolbarProps) => {
+  const onOpenCoverImageModal = useCoverImage((state) => state.onOpen)
   const inputRef = useRef<ComponentRef<'textarea'>>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [value, setValue] = useState(initialData.title)
@@ -95,7 +97,7 @@ export const Toolbar = ({ initialData, preview = false }: ToolbarProps) => {
         {/* 无封面且非预览模式下显示添加封面按钮 */}
         {!initialData.coverImage && !preview && (
           <Button
-            onClick={() => {}}
+            onClick={onOpenCoverImageModal}
             className="text-muted-foreground text-xs"
             variant="outline"
             size="sm"
@@ -105,6 +107,7 @@ export const Toolbar = ({ initialData, preview = false }: ToolbarProps) => {
           </Button>
         )}
       </div>
+      {/* 标题部分 */}
       {isEditing && !preview ? (
         <TextareaAutosize
           ref={inputRef}
