@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { Title } from '@/app/(main)/_components/Title'
 import { Banner } from '@/app/(main)/_components/Banner'
 import { Menu } from '@/app/(main)/_components/Menu'
+import { Publish } from '@/app/(main)/_components/Publish'
 import { useQuery } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { Id } from '@/convex/_generated/dataModel'
@@ -46,6 +47,7 @@ export const Navbar = ({ isCollapsed, showSidebar }: NavbarProps) => {
         <div className="flex w-full items-center justify-between">
           <Title initialData={page} />
           <div className="flex items-center gap-x-2">
+            <Publish initialData={page} />
             <Menu pageId={page._id} />
           </div>
         </div>
