@@ -1,20 +1,20 @@
 'use client'
 
-import { useQuery } from 'convex/react'
-import { useParams } from 'next/navigation'
-import { api } from '@/convex/_generated/api'
-import { Id } from '@/convex/_generated/dataModel'
 import { MenuIcon } from 'lucide-react'
+import { useParams } from 'next/navigation'
 import { Title } from '@/app/(main)/_components/Title'
 import { Banner } from '@/app/(main)/_components/Banner'
 import { Menu } from '@/app/(main)/_components/Menu'
+import { useQuery } from 'convex/react'
+import { api } from '@/convex/_generated/api'
+import { Id } from '@/convex/_generated/dataModel'
 
 interface NavbarProps {
   isCollapsed: boolean
-  onResetWidth: () => void
+  showSidebar: () => void
 }
 
-export const Navbar = ({ isCollapsed, onResetWidth }: NavbarProps) => {
+export const Navbar = ({ isCollapsed, showSidebar }: NavbarProps) => {
   const params = useParams()
   const page = useQuery(api.pages.getPageById, { id: params.pageId as Id<'pages'> })
   if (page === undefined) {
@@ -35,11 +35,13 @@ export const Navbar = ({ isCollapsed, onResetWidth }: NavbarProps) => {
     <>
       <div className="bg-background flex w-full items-center gap-x-4 px-3 py-2 dark:bg-[#1f1f1f]">
         {isCollapsed && (
-          <MenuIcon
+          <div
+            onClick={showSidebar}
             role="button"
-            onClick={onResetWidth}
-            className="text-muted-foreground h-6 w-6"
-          />
+            className="text-muted-foreground hover:bg-primary/5 h-6 w-6 rounded-sm p-0.5"
+          >
+            <MenuIcon className="h-5 w-5" />
+          </div>
         )}
         <div className="flex w-full items-center justify-between">
           <Title initialData={page} />

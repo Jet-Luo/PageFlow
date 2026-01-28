@@ -1,6 +1,6 @@
 'use client'
 
-import { SignOutButton, useUser } from '@clerk/nextjs'
+import { ChevronsLeftRight } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,9 +9,9 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { ChevronsLeftRight } from 'lucide-react'
+import { SignOutButton, useUser } from '@clerk/nextjs'
 
-const UserItem = () => {
+export const UserItem = () => {
   const { user } = useUser()
   return (
     <DropdownMenu>
@@ -64,5 +64,3 @@ const UserItem = () => {
     </DropdownMenu>
   )
 }
-
-export default UserItem

@@ -71,8 +71,9 @@ export const createPage = mutation({
       isArchived: false,
       isPublished: false
     })
+    // console.log('Created Page:', page)
 
-    return page
+    return page // 返回的是 newPage._id
   }
 })
 

@@ -1,14 +1,14 @@
 'use client'
 
 import { ChevronDown, ChevronRight, LucideIcon, MoreHorizontal, Plus, Trash } from 'lucide-react'
-import { useUser } from '@clerk/nextjs'
-import { Id } from '@/convex/_generated/dataModel'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { Skeleton } from '@/components/ui/skeleton'
+import { useUser } from '@clerk/nextjs'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
-// import { router } from 'next/navigation'
+import { Id } from '@/convex/_generated/dataModel'
 import { toast } from 'sonner'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +43,7 @@ export const Item = ({
   expanded,
   onExpand
 }: ItemProps) => {
+  const router = useRouter()
   const { user } = useUser()
   const ChevronIcon = expanded ? ChevronDown : ChevronRight
 
@@ -55,9 +56,9 @@ export const Item = ({
   const onCreateClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation() // 阻止事件冒泡，避免触发父元素的 onClick
     if (!id) return
-    const promise = create({ title: 'Untitled Page', parentPage: id }).then((pageId) => {
+    const promise = create({ title: 'Inner Page', parentPage: id }).then((newPageId) => {
       if (!expanded) onExpand?.()
-      // router.push(`/pages/${pageId}`)
+      router.push(`/pages/${newPageId}`)
     })
     toast.promise(promise, {
       loading: 'Creating your new page...',

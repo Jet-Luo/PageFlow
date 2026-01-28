@@ -2,21 +2,20 @@
 
 import { ChevronsLeft, MenuIcon, Plus, PlusCircle, Search, Settings, Trash } from 'lucide-react'
 import React, { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
-import { useMediaQuery } from 'usehooks-ts'
-import { usePathname } from 'next/dist/client/components/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
+import { Navbar } from '@/app/(main)/_components/Navbar'
+import { Item } from '@/app/(main)/_components/Item'
+import { UserItem } from '@/app/(main)/_components/UserItem'
+import { PageList } from '@/app/(main)/_components/PageList'
+import { TrashBox } from '@/app/(main)/_components/TrashBox'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
-import UserItem from '@/app/(main)/_components/UserItem'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
-import { Item } from '@/app/(main)/_components/Item'
-import { toast } from 'sonner'
-import { PageList } from '@/app/(main)/_components/PageList'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { TrashBox } from '@/app/(main)/_components/TrashBox'
+import { useMediaQuery } from 'usehooks-ts'
 import { useSearch } from '@/hooks/use-search'
 import { useSettings } from '@/hooks/use-settings'
-import { useParams } from 'next/navigation'
-import { Navbar } from '@/app/(main)/_components/Navbar'
+import { toast } from 'sonner'
 
 export const Navigation = () => {
   // const search = useSearch() // 将导致 Navigation 在 isOpen 变化时重新渲染，但 Navigation 本身并不依赖 isOpen，所以无需整体订阅
@@ -26,6 +25,7 @@ export const Navigation = () => {
 
   const createPage = useMutation(api.pages.createPage)
 
+  const router = useRouter()
   const params = useParams()
   const pathname: string = usePathname()
   const isMobile: boolean = useMediaQuery('(max-width: 768px)')
@@ -182,7 +182,6 @@ export const Navigation = () => {
 
   // const handleCreatePage = async (): Promise<void> => {
   //   const newPage = await createPage({ title: 'Untitled Page' })
-  //   // Redirect to the newly created page's page
   //   window.location.href = `/pages/${newPage._id.toString()}`
   // }
 
@@ -190,9 +189,8 @@ export const Navigation = () => {
     const promise = createPage({ title: 'Untitled' })
     toast.promise(promise, {
       loading: 'Creating your new page...',
-      success: (newPage) => {
-        // Redirect to the newly created page's page
-        // window.location.href = `/pages/${newPage._id.toString()}`
+      success: (newPageId) => {
+        router.push(`/pages/${newPageId}`) // 创建成功后跳转到新页面
         return 'Page created successfully!'
       },
       error: 'Error creating page. Please try again.'
@@ -214,7 +212,7 @@ export const Navigation = () => {
           onClick={collapseSidebar}
           role="button"
           className={cn(
-            'text-muted-foreground absolute top-3 right-4 h-6 w-6 rounded-sm opacity-0 transition group-hover/sidebar:opacity-100 hover:bg-neutral-300 dark:bg-neutral-600',
+            'text-muted-foreground hover:bg-primary/5 absolute top-3 right-4 h-6 w-6 rounded-sm opacity-0 transition group-hover/sidebar:opacity-100',
             isMobile && 'opacity-100'
           )}
         >
@@ -258,23 +256,24 @@ export const Navigation = () => {
       <nav
         ref={navbarRef}
         className={cn(
-          'bg-secondary absolute top-0 left-60 z-9999 h-16 w-[calc(100%-15rem)]',
+          'absolute top-0 left-60 z-9999 w-[calc(100%-15rem)]',
           isResetting && 'transition-all duration-300'
           // isMobile && 'left-0 w-full'
         )}
       >
         {!!params.pageId ? (
-          <Navbar isCollapsed={isCollapsed} onResetWidth={showSidebar} />
+          <Navbar isCollapsed={isCollapsed} showSidebar={showSidebar} />
         ) : (
-          <div className="w-full bg-transparent px-3 py-2">
+          <div className="w-full bg-transparent px-4 py-3">
             {isCollapsed && (
-              <MenuIcon
+              <div
                 onClick={showSidebar}
                 role="button"
-                className="text-muted-foreground h-6 w-6 rounded-sm hover:bg-neutral-300 dark:bg-neutral-600"
-              />
+                className="text-muted-foreground hover:bg-primary/5 h-6 w-6 rounded-sm p-0.5"
+              >
+                <MenuIcon className="h-5 w-5" />
+              </div>
             )}
-            123456789012345678901234567890123456789012345678901234567890
           </div>
         )}
       </nav>

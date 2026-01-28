@@ -1,14 +1,13 @@
 'use client'
 
-import { use } from 'react'
-import { Id } from '@/convex/_generated/dataModel'
-import { useQuery } from 'convex/react'
-import { api } from '@/convex/_generated/api'
+import { use, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import { Toolbar } from '@/components/toolbar'
 import { Cover } from '@/components/cover'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Editor } from '@/components/editor'
-import { useMutation } from 'convex/react'
+import { useQuery, useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
+import { Id } from '@/convex/_generated/dataModel'
 
 interface PageIdPageProps {
   params: Promise<{
@@ -20,6 +19,8 @@ const PageIdPage = ({ params }: PageIdPageProps) => {
   const id = use(params).pageId
   const page = useQuery(api.pages.getPageById, { id })
   const update = useMutation(api.pages.updatePage)
+
+  const Editor = useMemo(() => dynamic(() => import('@/components/editor'), { ssr: false }), [])
 
   const onContentChange = async (content: string) => {
     await update({

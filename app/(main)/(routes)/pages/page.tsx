@@ -1,14 +1,16 @@
 'use client'
 
-import Image from 'next/image'
-import { useUser } from '@clerk/nextjs'
-import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { useUser } from '@clerk/nextjs'
 import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { toast } from 'sonner'
 
 const PagesPage = () => {
+  const router = useRouter()
   const { user } = useUser()
   const createPage = useMutation(api.pages.createPage)
 
@@ -17,9 +19,8 @@ const PagesPage = () => {
 
     toast.promise(promise, {
       loading: 'Creating your new page...',
-      success: (newPage) => {
-        // Redirect to the newly created page's page
-        // window.location.href = `/pages/${newPage._id.toString()}`
+      success: (newPageId) => {
+        router.push(`/pages/${newPageId}`) // Redirect to the newly created page
         return 'Page created successfully!'
       },
       error: 'Error creating page. Please try again.'
