@@ -56,11 +56,15 @@ export const Publish = ({ initialData }: PublishProps) => {
     })
   }
 
-  const onCopy = () => {
-    navigator.clipboard.writeText(url)
-    setCopied(true)
-    toast.success('Flow link copied to clipboard!')
-    setTimeout(() => setCopied(false), 1000)
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      toast.success('Flow link copied to clipboard!')
+      setTimeout(() => setCopied(false), 1000)
+    } catch {
+      toast.error('Failed to copy the link. Please try again.')
+    }
   }
 
   return (
@@ -74,8 +78,8 @@ export const Publish = ({ initialData }: PublishProps) => {
             </>
           ) : (
             <>
-              <Send className="h-4 w-4" />
-              <div>Flow this Page</div>
+              <Send className="text-muted-foreground h-4 w-4" />
+              <div className="text-muted-foreground">Flow this Page</div>
             </>
           )}
         </Button>

@@ -52,7 +52,8 @@ export const Navbar = ({ isCollapsed, showSidebar }: NavbarProps) => {
           </div>
         </div>
       </div>
-      {page.isArchived && <Banner pageId={page._id} />}
+      {/*{page.isArchived && <Banner pageId={page._id} />}*/}
+      <Banner initialData={page} />
     </>
   )
 }
