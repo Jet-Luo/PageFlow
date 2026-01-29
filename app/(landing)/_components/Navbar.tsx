@@ -26,7 +26,7 @@ export const Navbar = () => {
       )}
     >
       <Logo />
-      <div className="flex items-center justify-between gap-x-2 md:ml-auto md:justify-end">
+      <div className="flex w-full items-center justify-between gap-x-2 md:ml-auto md:justify-end">
         {isLoading && <Spinner />}
         {!isLoading && !isAuthenticated && (
           <SignInButton mode="modal">
@@ -36,12 +36,12 @@ export const Navbar = () => {
           </SignInButton>
         )}
         {!isLoading && isAuthenticated && (
-          <>
+          <div className="flex items-center">
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/documents">Go to PageFlow</Link>
+              <Link href="/pages">Go to PageFlow</Link>
             </Button>
             <UserButton />
-          </>
+          </div>
         )}
         <ModeToggle />
       </div>

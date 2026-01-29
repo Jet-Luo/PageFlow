@@ -4,8 +4,8 @@ import { ChevronsLeft, MenuIcon, Plus, PlusCircle, Search, Settings, Trash } fro
 import React, { ComponentRef, useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import { Navbar } from '@/app/(main)/_components/Navbar'
-import { Item } from '@/app/(main)/_components/Item'
 import { UserItem } from '@/app/(main)/_components/UserItem'
+import { Item } from '@/app/(main)/_components/Item'
 import { PageList } from '@/app/(main)/_components/PageList'
 import { TrashBox } from '@/app/(main)/_components/TrashBox'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -87,9 +87,19 @@ export const Navigation = () => {
         navbarRef.current.style.left = '0'
       } else {
         // Desktop: Navbar 让出空间
-        if (sidebarRef.current.style.width === '100%') sidebarRef.current.style.width = '15rem'
-        navbarRef.current.style.left = `${sidebarRef.current.style.width}`
-        navbarRef.current.style.width = `calc(100% - ${sidebarRef.current.style.width})`
+        // if (sidebarRef.current.style.width === '100%') sidebarRef.current.style.width = '15rem'
+        // 修复 bug: element.style.width 只能获取内联样式。（也就是直接写在 HTML标签的 style="..." 属性中，或者通过 JavaScript 动态设置的样式）
+        // 初始状态下依靠 class w-60 设置宽度，style.width 为空字符串。
+        // 如果为空，或者为 100%（移动端残留），都显式重置为 15rem，确保后续计算 sidebarWidth 有值。
+        if (!sidebarRef.current.style.width || sidebarRef.current.style.width === '100%') {
+          sidebarRef.current.style.width = '15rem'
+        }
+        const sidebarWidth = sidebarRef.current.style.width
+        console.log('sidebarWidth:', sidebarWidth)
+        // navbarRef.current.style.left = `${sidebarRef.current.style.width}`
+        // navbarRef.current.style.width = `calc(100% - ${sidebarRef.current.style.width})`
+        navbarRef.current.style.left = sidebarWidth
+        navbarRef.current.style.width = `calc(100% - ${sidebarWidth})`
       }
       setTimeout(() => setIsResetting(false), 300) // 300ms 后取消过渡效果，与 CSS 过渡时间一致
     }

@@ -53,7 +53,7 @@ const PagesPage = () => {
       </h2>
       <Button onClick={onCreatePage}>
         <PlusCircle className="h-4 w-4" />
-        Create your first Page
+        Create your Page
       </Button>
       {/*<h1 className="text-2xl font-bold">Documents Page</h1>*/}
       {/*<p className="mt-4">This is the pages page content.</p>*/}

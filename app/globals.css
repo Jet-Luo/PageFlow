@@ -129,6 +129,9 @@
   }
 }
 
+/* 实现旧的 hover 效果，即触摸设备在点击时触发 hover 样式 */
+@custom-variant hover (&:hover);
+
 /* Make sure the html and body elements take full height */
 html,
 body,

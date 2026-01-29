@@ -35,7 +35,7 @@ export const Cover = ({ url, preview }: CoverProps) => {
     // <div className="flex h-48 w-full items-center justify-center bg-gray-300 dark:bg-gray-700">
     //   <span className="text-gray-600 dark:text-gray-400">Cover Image Placeholder</span>
     // </div>
-    <div className={cn('group relative h-[35vh] w-full', !url && 'h-[12vh]', url && 'bg-muted')}>
+    <div className={cn('group relative h-[35vh] w-full', !url && 'h-[20vh]', url && 'bg-muted')}>
       {!!url && (
         <Image
           src={url}
@@ -73,5 +73,5 @@ export const Cover = ({ url, preview }: CoverProps) => {
 }
 
 Cover.Skeleton = function CoverSkeleton() {
-  return <Skeleton className="h-[12vh] w-full" />
+  return <Skeleton className="h-[20vh] w-full" />
 }
