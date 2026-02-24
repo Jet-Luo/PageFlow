@@ -7,6 +7,7 @@ import React, { useRef, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useDebounceCallback } from '@/hooks/use-debounce-callback'
 
 interface TitleProps {
   initialData: Doc<'pages'>
@@ -17,6 +18,11 @@ export const Title = ({ initialData }: TitleProps) => {
   const [isEditing, setIsEditing] = useState(false)
   const [title, setTitle] = useState(initialData.title || 'Untitled')
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // 防抖 500ms：本地 state 立即更新（UI 响应流畅），数据库写入合并到最后一次
+  const debouncedUpdateTitle = useDebounceCallback((value: string) => {
+    updateTitle({ id: initialData._id, title: value })
+  }, 500)
 
   const enableEditing = () => {
     setTitle(initialData.title)
@@ -34,13 +40,10 @@ export const Title = ({ initialData }: TitleProps) => {
     // 已经在 onChange 中实时更新标题，无需在此处重复更新
   }
 
-  const onChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(event.target.value)
-    // 实时更新标题
-    await updateTitle({
-      id: initialData._id,
-      title: event.target.value || 'Untitled' // 不允许标题为空
-    })
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = event.target.value
+    setTitle(newTitle) // 立即更新本地 UI，保证输入流畅
+    debouncedUpdateTitle(newTitle || 'Untitled') // 防抖写库，合并高频请求
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

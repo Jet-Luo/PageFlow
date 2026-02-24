@@ -9,6 +9,7 @@ import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import TextareaAutosize from 'react-textarea-autosize'
 import { useCoverImage } from '@/hooks/use-cover-image'
+import { useDebounceCallback } from '@/hooks/use-debounce-callback'
 
 interface ToolbarProps {
   initialData: Doc<'pages'>
@@ -23,13 +24,26 @@ export const Toolbar = ({ initialData, preview = false }: ToolbarProps) => {
   const update = useMutation(api.pages.updatePage)
   const removeIcon = useMutation(api.pages.removeIcon)
 
+  // 防抖 500ms：标题连续输入时合并请求，只在停止输入后写库一次
+  // 注意：onIconSelect / onRemoveIcon 是离散操作，不需要防抖
+  const debouncedUpdateTitle = useDebounceCallback((title: string) => {
+    update({ id: initialData._id, title })
+  }, 500)
+
   const enableEditing = () => {
     if (preview) return // 预览模式下不允许编辑
     // setIsEditing(true)
     // 使用 setTimeout 将其转变为微任务，在下一个事件循环中执行，以确保输入框已经渲染，等输入框渲染完成后再执行聚焦和选中操作
+    // setTimeout(() => {
+    //   setValue(initialData.title)
+    //   inputRef.current?.focus() // 聚焦
+    // }, 0)
+    // setValue(initialData.title) 不在此处重置：
+    // 1. useEffect 已负责监听 initialData.title 变化并同步
+    // 2. 若此处重置，会在防抖计时期间覆盖用户刚输入的内容（onFocus 会反复触发）
     setTimeout(() => {
-      setValue(initialData.title)
       inputRef.current?.focus() // 聚焦
+      // inputRef.current?.setSelectionRange(0, inputRef.current.value.length) // 选中全部文本
     }, 0)
   }
   const disableEditing = () => {
@@ -37,12 +51,8 @@ export const Toolbar = ({ initialData, preview = false }: ToolbarProps) => {
     // 已经在 onInput 中实时更新标题，无需在此处重复更新
   }
   const onInput = (value: string) => {
-    setValue(value)
-    // 实时更新标题
-    update({
-      id: initialData._id,
-      title: value || 'Untitled' // 不允许标题为空
-    })
+    setValue(value) // 立即更新本地 UI，保证输入流畅
+    debouncedUpdateTitle(value || 'Untitled') // 防抖写库，合并高频请求
   }
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
