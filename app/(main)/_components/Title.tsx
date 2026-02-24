@@ -3,7 +3,7 @@
 import { useMutation } from 'convex/react'
 import { Doc } from '@/convex/_generated/dataModel'
 import { api } from '@/convex/_generated/api'
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -19,6 +19,7 @@ export const Title = ({ initialData }: TitleProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const enableEditing = () => {
+    setTitle(initialData.title)
     setIsEditing(true)
     // 自动聚焦并选中全部文本
     // 使用 setTimeout 将其转变为微任务，在下一个事件循环中执行，以确保输入框已经渲染，等输入框渲染完成后再执行聚焦和选中操作
@@ -33,10 +34,10 @@ export const Title = ({ initialData }: TitleProps) => {
     // 已经在 onChange 中实时更新标题，无需在此处重复更新
   }
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value)
     // 实时更新标题
-    updateTitle({
+    await updateTitle({
       id: initialData._id,
       title: event.target.value || 'Untitled' // 不允许标题为空
     })

@@ -247,13 +247,31 @@ export const getPageById = query({
     const page = await ctx.db.get(args.id)
     if (!page) throw new Error('Page not found')
 
-    if (page.isPublished && !page.isArchived) return page
+    // 如果页面是公开的，直接返回；但由于不允许访问未 publish 的 preview 页面（即使是拥有者），所以新增专用于 Public Preview 的查询 getPublishedPageById
+    if (page.isPublished && !page.isArchived) return page // 将不会使用这行代码
 
     if (!identity) throw new Error('Unauthorized')
     const userId = identity.subject
     if (page.userId !== userId) throw new Error('Forbidden')
 
     return page
+  }
+})
+
+// 新增：专门用于 Public Preview 的查询
+// 这个接口不检查身份，只检查公开状态 -> 解决身份加载竞态问题
+export const getPublishedPageById = query({
+  args: {
+    id: v.id('pages')
+  },
+  handler: async (ctx, args) => {
+    const page = await ctx.db.get(args.id)
+    if (!page) throw new Error('Page not found')
+
+    // if (page.isPublished && !page.isArchived) return page
+    if (page.isPublished) return page
+
+    throw new Error('Page is not published or has been archived')
   }
 })
 

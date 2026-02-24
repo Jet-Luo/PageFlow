@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic'
 import { Toolbar } from '@/components/toolbar'
 import { Cover } from '@/components/cover'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useQuery, useMutation } from 'convex/react'
+import { useQuery } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { Id } from '@/convex/_generated/dataModel'
 
@@ -17,17 +17,8 @@ interface PageIdPageProps {
 
 const PageIdPage = ({ params }: PageIdPageProps) => {
   const id = use(params).pageId
-  const page = useQuery(api.pages.getPageById, { id })
-  const update = useMutation(api.pages.updatePage)
-
+  const page = useQuery(api.pages.getPublishedPageById, { id }) // 使用 getPublishedPageById，严格限制由于未发布导致的访问
   const Editor = useMemo(() => dynamic(() => import('@/components/editor'), { ssr: false }), [])
-
-  const onContentChange = async (content: string) => {
-    await update({
-      id,
-      content
-    })
-  }
 
   if (page === undefined) {
     return (
@@ -48,12 +39,13 @@ const PageIdPage = ({ params }: PageIdPageProps) => {
   if (page === null) {
     return <div>Page not found</div>
   }
+
   return (
     <div className="pb-80">
       <Cover url={page.coverImage} preview />
       <div className="mx-auto md:max-w-3xl lg:max-w-4xl">
         <Toolbar initialData={page} preview />
-        <Editor onChange={onContentChange} initialContent={page.content} editable={false} />
+        <Editor initialContent={page.content} editable={false} />
       </div>
     </div>
   )

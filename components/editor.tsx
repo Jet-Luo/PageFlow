@@ -8,7 +8,7 @@ import { useTheme } from 'next-themes'
 import { useEdgeStore } from '@/lib/edgestore'
 
 interface EditorProps {
-  onChange: (value: string) => void
+  onChange?: (value: string) => void
   initialContent?: string
   editable?: boolean
 }
@@ -24,7 +24,7 @@ const Editor = ({ onChange, initialContent, editable }: EditorProps) => {
     return res.url // 返回上传后的文件 URL
   }
   const handleEditorChange = () => {
-    onChange(JSON.stringify(editor.document, null, 2))
+    onChange?.(JSON.stringify(editor.document, null, 2))
   }
 
   const editor: BlockNoteEditor = useCreateBlockNote({
