@@ -7,9 +7,11 @@ import { api } from '@/convex/_generated/api'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { ConfirmModal } from '@/components/modals/confirm-modal'
-import { Send, Trash, X } from 'lucide-react'
+import { CloudOff, Loader2, RefreshCw, Send, Trash, WifiOff, X } from 'lucide-react'
 import { usePublishBanner } from '@/hooks/use-publish-banner'
 import { useOrigin } from '@/hooks/use-origin'
+import { useNetworkStatus } from '@/hooks/use-network-status'
+import { useSyncTrigger } from '@/hooks/use-sync-trigger'
 
 interface BannerProps {
   // pageId: Id<'pages'>
@@ -24,6 +26,10 @@ export const Banner = ({ initialData }: BannerProps) => {
   const deletePermanently = useMutation(api.pages.deletePagePermanently)
   const { hiddenPageIds, onHide } = usePublishBanner()
   const showPublishBanner = !hiddenPageIds.includes(initialData._id)
+  const { isOnline, syncStatus, hasPendingPage } = useNetworkStatus()
+  const { syncAllPending } = useSyncTrigger()
+  const hasPendingForPage = hasPendingPage(initialData._id)
+  const showOfflineBanner = !isOnline || hasPendingForPage
 
   const onDeletePermanently = () => {
     const promise = deletePermanently({ id: initialData._id })
@@ -104,6 +110,39 @@ export const Banner = ({ initialData }: BannerProps) => {
           >
             <X />
           </Button>
+        </div>
+      )}
+      {showOfflineBanner && (
+        <div className="flex w-full items-center justify-center gap-x-2 bg-neutral-500/90 p-2 text-center text-sm text-white">
+          {!isOnline ? (
+            <WifiOff className="h-4 w-4 shrink-0" />
+          ) : syncStatus === 'syncing' ? (
+            <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+          ) : (
+            <CloudOff className="h-4 w-4 shrink-0" />
+          )}
+          <p className="font-semibold">
+            {syncStatus === 'syncing'
+              ? 'Syncing changes to cloud…'
+              : !isOnline && !hasPendingForPage
+                ? 'Offline · New edits will be saved locally.'
+                : !isOnline && hasPendingForPage
+                  ? 'Offline · Changes saved locally.'
+                  : syncStatus === 'failed'
+                    ? 'Sync failed · Changes still saved locally.'
+                    : 'Changes saved locally · Not yet synced.'}
+          </p>
+          {hasPendingForPage && syncStatus !== 'syncing' && (
+            <Button
+              size="sm"
+              onClick={syncAllPending}
+              variant="outline"
+              className="h-auto border-white bg-transparent p-1 px-2 text-white hover:bg-white hover:text-neutral-600 dark:hover:bg-white dark:hover:text-neutral-600"
+            >
+              <RefreshCw className="mr-1 h-3 w-3" />
+              Retry Sync
+            </Button>
+          )}
         </div>
       )}
     </div>

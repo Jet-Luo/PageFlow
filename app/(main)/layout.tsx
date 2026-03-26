@@ -6,6 +6,7 @@ import { Spinner } from '@/components/spinner'
 import { redirect } from 'next/navigation'
 import { Navigation } from '@/app/(main)/_components/Navigation'
 import { SearchCommand } from '@/components/search-command'
+import { OfflineSyncMount } from '@/app/(main)/_components/OfflineSyncMount'
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useConvexAuth()
@@ -20,6 +21,8 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
   }
   return (
     <div className="flex h-full dark:bg-[#1f1f1f]">
+      {/* Mount offline sync listeners and polling once at layout level */}
+      <OfflineSyncMount />
       <Navigation />
       <main className="h-full flex-1 overflow-x-hidden">
         <SearchCommand />
